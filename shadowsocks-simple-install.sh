@@ -1,5 +1,5 @@
 #!/bin/bash
-export PORT=80# Если порт 8000 заблокирован в вашей сети, измените на любой бругой 
+export PORT=443# Если порт 8000 заблокирован в вашей сети, измените на любой бругой 
 export PASSWORD=$( cat /dev/urandom | tr --delete --complement 'a-z0-9' | head --bytes=16 )
 export IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 export ENCRYPTION=chacha20-ietf-poly1305
@@ -67,7 +67,7 @@ function config_info() {
 if [ -f "/etc/debian_version" ]; then
 	DEBIAN_FRONTEND=noninteractive apt-get update
 	DEBIAN_FRONTEND=noninteractive apt-get install -y shadowsocks-libev # install shadowsocks
-	ufw allow "$PORT"/tcp
+	ufw allow "$PORT"/udp
 elif [ -f "/etc/redhat-release" ]; then
 	yum install -y epel-release
 	curl --location --output "/etc/yum.repos.d/librehat-shadowsocks-epel-7.repo" "https://copr.fedorainfracloud.org/coprs/librehat/shadowsocks/repo/epel-7/librehat-shadowsocks-epel-7.repo"
@@ -78,7 +78,7 @@ elif [ -f "/etc/redhat-release" ]; then
 	systemctl daemon-reload
 	systemctl enable shadowsocks-libev
 	systemctl restart shadowsocks-libev
-	firewall-cmd --zone=public --permanent --add-port="$PORT"/tcp
+	firewall-cmd --zone=public --permanent --add-port="$PORT"/udp
 	firewall-cmd --reload
 else
   echo "Your OS not supported"
